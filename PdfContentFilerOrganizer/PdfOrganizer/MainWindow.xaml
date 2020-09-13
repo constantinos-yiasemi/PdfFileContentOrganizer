@@ -1,0 +1,34 @@
+﻿<Window x:Class="PdfOrganizer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PdfOrganizer"
+        mc:Ignorable="d"
+        Title="Pdf Organizer" Height="550" Width="800" Icon="/pdfOrganizer.png">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60*"/>
+            <RowDefinition Height="40*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Label Grid.ColumnSpan="2" Content="Folder to scan for Pdf files:" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
+        <Button Grid.ColumnSpan="2" Name="BtnFolderScan" Content="Change . . ." HorizontalAlignment="Left" Height="26" Margin="680,40,0,0" VerticalAlignment="Top" Width="83" Click="BtnFolderScan_Click" Background="#FFF7CFA6"/>
+        <Label Content="Destination folder for Pdf files:" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtnFolderDestination" Content="Change . . ." HorizontalAlignment="Left" Height="26" Margin="680,80,0,0" VerticalAlignment="Top" Width="83" Click="BtnFolderDestination_Click" Background="#FFF7CFA6" Grid.ColumnSpan="2"/>
+        <Label Content="Automatic run in minutes:" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top"/>
+        <ComboBox Grid.ColumnSpan="2" x:Name="CbMinutes" IsEditable="True"  IsReadOnly="True"  Text="-- select time --" HorizontalAlignment="Left" Margin="282,127,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" SelectionChanged="CbMinutes_SelectionChanged"/>
+        <CheckBox x:Name="CheckBoxAutomatiIntervalsEnable" Content="Enable" HorizontalAlignment="Left" Margin="200,127,0,0" VerticalAlignment="Top" Checked="CheckBoxAutomatiIntervalsEnable_Checked" Unchecked="CheckBoxAutomatiIntervalsEnable_Unchecked" RenderTransformOrigin="0.325,0.429" Height="22" Width="77"/>
+        <Button Grid.ColumnSpan="2" x:Name="BtnStartOrganizing" Content="Start Organizing" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="238" Click="BtnStartOrganizing_Click" Margin="285,191,0,0" Background="#FF7FCB78"/>
+        <Label Grid.ColumnSpan="2" Name="LblScanFolder" Content="Selected folder to scan pdf" HorizontalAlignment="Left" Margin="200,40,0,0" VerticalAlignment="Top" Width="475" Background="#FFD0E6DD"/>
+        <Label Grid.ColumnSpan="2" Name="LblDestinationFolder" Content="Selected folder to store pdf" HorizontalAlignment="Left" Margin="200,80,0,0" VerticalAlignment="Top" Width="475" Background="#FFD0E6DD"/>
+        <ListBox Grid.Row="1" Grid.Column="0" Name="LbOutputData" Visibility="Hidden"/>
+        <ListBox Grid.Row="1" Grid.Column="1" x:Name="LbDebugData" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Black" Foreground="#FF6CF71C" Visibility="Hidden"/>
+        <Button  x:Name="BtnStop" Content="Stop" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="65" Click="BtnStop_Click" Margin="535,191,0,0" Grid.ColumnSpan="2"  Background="#FFB60000" Foreground="White" Visibility="Hidden"/>
+        <Button x:Name="BtnShowDetails" Content="Show details" HorizontalAlignment="Left" Height="19" VerticalAlignment="Top" Width="83" Click="BtnShowDetails_Click" Background="#FFD0E6DD" Margin="680,230,0,0" Grid.ColumnSpan="2"/>
+
+    </Grid>
+</Window>
