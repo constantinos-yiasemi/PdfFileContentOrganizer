@@ -26,9 +26,12 @@
         <Label Grid.ColumnSpan="2" Name="LblScanFolder" Content="Selected folder to scan pdf" HorizontalAlignment="Left" Margin="200,40,0,0" VerticalAlignment="Top" Width="475" Background="#FFD0E6DD"/>
         <Label Grid.ColumnSpan="2" Name="LblDestinationFolder" Content="Selected folder to store pdf" HorizontalAlignment="Left" Margin="200,80,0,0" VerticalAlignment="Top" Width="475" Background="#FFD0E6DD"/>
         <ListBox Grid.Row="1" Grid.Column="0" Name="LbOutputData" Visibility="Hidden"/>
-        <ListBox Grid.Row="1" Grid.Column="1" x:Name="LbDebugData" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Black" Foreground="#FF6CF71C" Visibility="Hidden"/>
+        <ListBox Grid.Row="1" Grid.Column="1" x:Name="LbDebugData" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Black" Foreground="#FF6CF71C" Visibility="Hidden" Margin="0,0,0,40"/>
         <Button  x:Name="BtnStop" Content="Stop" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="65" Click="BtnStop_Click" Margin="535,191,0,0" Grid.ColumnSpan="2"  Background="#FFB60000" Foreground="White" Visibility="Hidden"/>
         <Button x:Name="BtnShowDetails" Content="Show details" HorizontalAlignment="Left" Height="19" VerticalAlignment="Top" Width="83" Click="BtnShowDetails_Click" Background="#FFD0E6DD" Margin="680,230,0,0" Grid.ColumnSpan="2"/>
-        <Label  Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="9" >Developed by: Constantinos Yiasemi, Mob: +357 99343417</Label>
+        <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <Label FontSize="9" VerticalAlignment="Bottom" HorizontalAlignment="Right">License: GNU Affero General Public License v3.0</Label>
+            <Label FontSize="9" VerticalAlignment="Bottom" HorizontalAlignment="Right" >Developed by: Constantinos Yiasemi, Mob: +357 99343417</Label>
+        </StackPanel>
     </Grid>
 </Window>
