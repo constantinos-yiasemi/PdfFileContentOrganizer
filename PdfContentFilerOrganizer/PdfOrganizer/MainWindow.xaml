@@ -29,6 +29,6 @@
         <ListBox Grid.Row="1" Grid.Column="1" x:Name="LbDebugData" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Black" Foreground="#FF6CF71C" Visibility="Hidden"/>
         <Button  x:Name="BtnStop" Content="Stop" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="65" Click="BtnStop_Click" Margin="535,191,0,0" Grid.ColumnSpan="2"  Background="#FFB60000" Foreground="White" Visibility="Hidden"/>
         <Button x:Name="BtnShowDetails" Content="Show details" HorizontalAlignment="Left" Height="19" VerticalAlignment="Top" Width="83" Click="BtnShowDetails_Click" Background="#FFD0E6DD" Margin="680,230,0,0" Grid.ColumnSpan="2"/>
-
+        <Label  Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="9" >Developed by: Constantinos Yiasemi, Mob: +357 99343417</Label>
     </Grid>
 </Window>

@@ -100,6 +100,7 @@ namespace PdfOrganizer
             if (dialog.ShowDialog(this).GetValueOrDefault())
             {
                 _pdfLookupDirectory = dialog.SelectedPath;
+                LblScanFolder.Content = _pdfLookupDirectory;
             }
         }
         private void BtnFolderDestination_Click(object sender, RoutedEventArgs e)
@@ -108,6 +109,7 @@ namespace PdfOrganizer
             if (dialog.ShowDialog(this).GetValueOrDefault())
             {
                 _pdfSaveDirectory = dialog.SelectedPath;
+                LblDestinationFolder.Content = _pdfSaveDirectory;
             }
         }
 
