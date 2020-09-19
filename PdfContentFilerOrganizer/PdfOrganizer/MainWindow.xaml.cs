@@ -2,10 +2,6 @@
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
-using Serilog.Formatting;
-using Serilog.Formatting.Display;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -130,9 +126,11 @@ namespace PdfOrganizer
             _cancellationTokenSource = new CancellationTokenSource();
             do
             {
+                var movingFiles = new ConcurrentDictionary<string, string>();
                 BtnStartOrganizing.IsEnabled = false;
                 BtnStop.Visibility = Visibility.Visible;
                 BtnStartOrganizing.Content = "Organizing . . .";
+
                 try
                 {
 
@@ -147,8 +145,6 @@ namespace PdfOrganizer
                         var foundPdfFiles = 0;
                         foreach (var directory in directories)
                         {
-
-
                             _logger.Information("- Looking in directory {directory}", directory);
                             foreach (var file in Directory.GetFiles(directory).Where(f => f.EndsWith(".pdf")))
                             {
@@ -222,15 +218,42 @@ namespace PdfOrganizer
 
                                     var fileDestinationPath = System.IO.Path.Combine(_pdfSaveDirectory, directoryName, fileName);
 
-                                    if (!File.Exists(fileDestinationPath))
-                                        File.Copy(file, fileDestinationPath);
-                                    else
+                                    if (File.Exists(fileDestinationPath))
                                         _logger.Warning("- - ### [ALREADY EXISTS] file {file} in {directory}", filenameFound, fileDestinationPath);
 
-                                    _logger.Information("- - *** Copied file {file} in {directory}", filenameFound, fileDestinationPath);
+                                    movingFiles.AddOrUpdate(file, fileDestinationPath, (x, y) => y);
+                                    pdfDoc.Close();
+                                    reader.Close();
                                 }
                             }
                         }
+
+                        foreach (var file in movingFiles)
+                        {
+                            try
+                            {
+                                var destinationFileName = file.Value;
+                                var i = 0;
+                                var destinationPath = System.IO.Path.GetDirectoryName(file.Value) + System.IO.Path.DirectorySeparatorChar + System.IO.Path.GetFileName(destinationFileName);
+                                while (File.Exists(destinationPath))
+                                {
+                                    i++;
+                                    destinationFileName = System.IO.Path.GetFileNameWithoutExtension(destinationFileName) + $"_{i}" + System.IO.Path.GetExtension(destinationFileName);
+
+                                    destinationPath = System.IO.Path.GetDirectoryName(file.Value) + System.IO.Path.DirectorySeparatorChar + destinationFileName;
+                                   _logger.Information("- - *** Renaming file from {filename} to {newfilename}", System.IO.Path.GetFileName(file.Value), destinationFileName);
+                                }
+                                destinationPath = System.IO.Path.GetDirectoryName(file.Value) + System.IO.Path.DirectorySeparatorChar + destinationFileName;
+                                File.Move(file.Key, destinationPath);
+
+                                _logger.Information("- - *** Moved file {file} in {directory}", System.IO.Path.GetFileName(file.Key), destinationPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Error(ex, "Error while organizing file {filename}.", file.Key);
+                            }
+                        }
+
                         timer.Stop();
                         _logger.Information("# Total searching time {searchTime} ms", timer.ElapsedMilliseconds);
                         _logger.Information("# Total pdf found {totalPdfFound}/{totalPdfFiles}", foundPdfFiles, totalPdfFiles);
@@ -299,31 +322,6 @@ namespace PdfOrganizer
                 BtnShowDetails.Content = "Show details";
             }
 
-        }
-    }
-
-    public class InMemorySink : ILogEventSink
-    {
-        readonly ITextFormatter _textFormatter = new MessageTemplateTextFormatter("{Timestamp} [{Level}] {Message}{Exception}");
-        private ListBox _debugOutput;
-
-        public ConcurrentQueue<string> Events { get; } = new ConcurrentQueue<string>();
-        public InMemorySink(ListBox debugOutput)
-        {
-            _debugOutput = debugOutput;
-        }
-        public void Emit(LogEvent logEvent)
-        {
-            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
-            var renderSpace = new StringWriter();
-            _textFormatter.Format(logEvent, renderSpace);
-            //            Events.Enqueue(renderSpace.ToString());
-            var valueToAdd = renderSpace.ToString();
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                _debugOutput.Items.Add(valueToAdd);
-                _debugOutput.ScrollIntoView(valueToAdd);
-            }));
         }
     }
 
