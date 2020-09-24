@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>pdfOrganizer.ico</ApplicationIcon>
-    <Version>1.09.17.01</Version>
+    <Version>1.09.24.01</Version>
     <Authors>Constantinos Yiasemi</Authors>
     <Description>An open source project for organizing pdf files based on configuration values.</Description>
     <Copyright>GNU Affero General Public License v3.0</Copyright>

@@ -145,86 +145,96 @@ namespace PdfOrganizer
                         var foundPdfFiles = 0;
                         foreach (var directory in directories)
                         {
-                            _logger.Information("- Looking in directory {directory}", directory);
-                            foreach (var file in Directory.GetFiles(directory).Where(f => f.EndsWith(".pdf")))
+                            try
                             {
-                                totalPdfFiles++;
-                                foreach (var searchingWords in _searhingKeywords)
-                                {
-                                    var keysToMakeFalse = new List<string>();
-                                    foreach (var searchPair in searchingWords.Keywords)
-                                    {
-                                        keysToMakeFalse.Add(searchPair.Key);
-                                    }
-                                    foreach (var key in keysToMakeFalse)
-                                    {
-                                        searchingWords.Keywords[key] = false;
-                                    }
-                                }
 
-                                _logger.Information("- - Looking in file {file}", System.IO.Path.GetFileName(file));
-                                PdfReader reader = new PdfReader(file);
-                                string[] words;
-                                string line;
-                                PdfDocument pdfDoc = new PdfDocument(reader);
-                                var text = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), new LocationTextExtractionStrategy());
 
-                                words = text.Split('\n');
-                                for (int j = 0, len = words.Length; j < len; j++)
+                                _logger.Information("- Looking in directory {directory}", directory);
+                                foreach (var file in Directory.GetFiles(directory).Where(f => f.EndsWith(".pdf")))
                                 {
-                                    line = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(words[j]));
+                                    totalPdfFiles++;
                                     foreach (var searchingWords in _searhingKeywords)
                                     {
-                                        var keysToMakeTrue = new List<string>();
+                                        var keysToMakeFalse = new List<string>();
                                         foreach (var searchPair in searchingWords.Keywords)
                                         {
-                                            if (line.ToLower().Contains(searchPair.Key.ToLower()))
+                                            keysToMakeFalse.Add(searchPair.Key);
+                                        }
+                                        foreach (var key in keysToMakeFalse)
+                                        {
+                                            searchingWords.Keywords[key] = false;
+                                        }
+                                    }
+
+                                    _logger.Information("- - Looking in file {file}", System.IO.Path.GetFileName(file));
+                                    PdfReader reader = new PdfReader(file);
+                                    string[] words;
+                                    string line;
+                                    PdfDocument pdfDoc = new PdfDocument(reader);
+                                    var text = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), new LocationTextExtractionStrategy());
+
+                                    words = text.Split('\n');
+                                    for (int j = 0, len = words.Length; j < len; j++)
+                                    {
+                                        line = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(words[j]));
+                                        foreach (var searchingWords in _searhingKeywords)
+                                        {
+                                            var keysToMakeTrue = new List<string>();
+                                            foreach (var searchPair in searchingWords.Keywords)
                                             {
-                                                keysToMakeTrue.Add(searchPair.Key);
+                                                if (line.ToLower().Contains(searchPair.Key.ToLower()))
+                                                {
+                                                    keysToMakeTrue.Add(searchPair.Key);
+                                                }
+                                            }
+                                            foreach (var key in keysToMakeTrue)
+                                            {
+                                                searchingWords.Keywords[key] = true;
                                             }
                                         }
-                                        foreach (var key in keysToMakeTrue)
-                                        {
-                                            searchingWords.Keywords[key] = true;
-                                        }
                                     }
-                                }
-                                if (_searhingKeywords.Any(s => s.Keywords.All(d => d.Value == true)))
-                                {
-                                    foundPdfFiles++;
-                                    var filenameFound = System.IO.Path.GetFileName(file);
-                                    _logger.Information("- - *** Found in file {file}", filenameFound);
-                                    var valueToAdd = $"{DateTime.Now.ToString("HH:mm:ss")} Found file - {filenameFound}";
-                                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                                    if (_searhingKeywords.Any(s => s.Keywords.All(d => d.Value == true)))
                                     {
-                                        LbOutputData.Items.Add(valueToAdd);
-                                        LbOutputData.ScrollIntoView(valueToAdd);
-                                    }));
-
-                                    foreach (var keywordFound in _searhingKeywords.Where(s => s.Keywords.All(d => d.Value == true)).Select(s => s.Keywords))
-                                    {
-                                        foreach (var k in keywordFound)
+                                        foundPdfFiles++;
+                                        var filenameFound = System.IO.Path.GetFileName(file);
+                                        _logger.Information("- - *** Found in file {file}", filenameFound);
+                                        var valueToAdd = $"{DateTime.Now.ToString("HH:mm:ss")} Found file - {filenameFound}";
+                                        Application.Current.Dispatcher.Invoke(new Action(() =>
                                         {
-                                            _logger.Information("- - - *** Values found  {valuesFound}", k.Key);
+                                            LbOutputData.Items.Add(valueToAdd);
+                                            LbOutputData.ScrollIntoView(valueToAdd);
+                                        }));
+
+                                        foreach (var keywordFound in _searhingKeywords.Where(s => s.Keywords.All(d => d.Value == true)).Select(s => s.Keywords))
+                                        {
+                                            foreach (var k in keywordFound)
+                                            {
+                                                _logger.Information("- - - *** Values found  {valuesFound}", k.Key);
+                                            }
+
                                         }
 
+                                        var directoryName = directory.Split("\\").Last();
+
+                                        Directory.CreateDirectory(System.IO.Path.Combine(_pdfSaveDirectory, directoryName));
+
+                                        var fileName = System.IO.Path.GetFileName(file);
+
+                                        var fileDestinationPath = System.IO.Path.Combine(_pdfSaveDirectory, directoryName, fileName);
+
+                                        if (File.Exists(fileDestinationPath))
+                                            _logger.Warning("- - ### [ALREADY EXISTS] file {file} in {directory}", filenameFound, fileDestinationPath);
+
+                                        movingFiles.AddOrUpdate(file, fileDestinationPath, (x, y) => y);
+                                        pdfDoc.Close();
+                                        reader.Close();
                                     }
-
-                                    var directoryName = directory.Split("\\").Last();
-
-                                    Directory.CreateDirectory(System.IO.Path.Combine(_pdfSaveDirectory, directoryName));
-
-                                    var fileName = System.IO.Path.GetFileName(file);
-
-                                    var fileDestinationPath = System.IO.Path.Combine(_pdfSaveDirectory, directoryName, fileName);
-
-                                    if (File.Exists(fileDestinationPath))
-                                        _logger.Warning("- - ### [ALREADY EXISTS] file {file} in {directory}", filenameFound, fileDestinationPath);
-
-                                    movingFiles.AddOrUpdate(file, fileDestinationPath, (x, y) => y);
-                                    pdfDoc.Close();
-                                    reader.Close();
                                 }
+                            }
+                            catch (UnauthorizedAccessException ex)
+                            {
+
+                                _logger.Error(ex, "Error while accessing folders.");
                             }
                         }
 
@@ -235,15 +245,21 @@ namespace PdfOrganizer
                                 var destinationFileName = file.Value;
                                 var i = 0;
                                 var destinationPath = System.IO.Path.GetDirectoryName(file.Value) + System.IO.Path.DirectorySeparatorChar + System.IO.Path.GetFileName(destinationFileName);
+                                var exists = false;
                                 while (File.Exists(destinationPath))
                                 {
+                                    exists = true;
                                     i++;
                                     destinationFileName = System.IO.Path.GetFileNameWithoutExtension(destinationFileName) + $"_{i}" + System.IO.Path.GetExtension(destinationFileName);
 
                                     destinationPath = System.IO.Path.GetDirectoryName(file.Value) + System.IO.Path.DirectorySeparatorChar + destinationFileName;
-                                   _logger.Information("- - *** Renaming file from {filename} to {newfilename}", System.IO.Path.GetFileName(file.Value), destinationFileName);
+                                    _logger.Information("- - *** Renaming file from {filename} to {newfilename}", System.IO.Path.GetFileName(file.Value), destinationFileName);
                                 }
-                                destinationPath = System.IO.Path.GetDirectoryName(file.Value) + System.IO.Path.DirectorySeparatorChar + destinationFileName;
+                                if (exists)
+                                    destinationPath = System.IO.Path.GetDirectoryName(file.Value) + System.IO.Path.DirectorySeparatorChar + destinationFileName;
+                                else
+                                    destinationPath = destinationFileName;
+
                                 File.Move(file.Key, destinationPath);
 
                                 _logger.Information("- - *** Moved file {file} in {directory}", System.IO.Path.GetFileName(file.Key), destinationPath);
